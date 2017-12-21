@@ -16,19 +16,17 @@
 
         public IConfiguration Configuration { get; }
 
-        private ICacheSubscriber _cacheSubscriber;
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
             services.AddScoped<ICacheSubscriber, RedisCacheSubscriber>();
             services.AddScoped<ILocalCacheProvider, MemoryCacheProvider>();
             services.AddScoped<IRemoteCacheProvider, RedisCacheProvider>();
-
-            services.AddScoped<IDemoService,DemoService>();
+            services.AddScoped<ISerializer, JsonSerializer>();
+            services.AddScoped<IDemoService, DemoService>();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ICacheSubscriber cacheSubscriber)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -48,12 +46,13 @@
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            _cacheSubscriber = cacheSubscriber;
+
+            var subscriber = app.ApplicationServices.GetRequiredService<ICacheSubscriber>();                   
 
             //channel name should read from database or settings
-            _cacheSubscriber.Subscribe("CacheAdd", NotifyType.Add);
-            _cacheSubscriber.Subscribe("CacheUpdate", NotifyType.Update);
-            _cacheSubscriber.Subscribe("CacheDelete", NotifyType.Delete);
+            subscriber.Subscribe("CacheAdd", NotifyType.Add);
+            subscriber.Subscribe("CacheUpdate", NotifyType.Update);
+            subscriber.Subscribe("CacheDelete", NotifyType.Delete);
         }
     }
 }

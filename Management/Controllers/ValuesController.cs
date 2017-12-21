@@ -1,5 +1,4 @@
-﻿
-namespace Management.Controllers
+﻿namespace Management.Controllers
 {
     using System;
     using Microsoft.AspNetCore.Mvc;
@@ -16,11 +15,22 @@ namespace Management.Controllers
         }
          
         [HttpGet]
-        public string Get()
+        public string Get(int type)
         {
-            _cache.Update("Test", DateTime.Now.ToString(), TimeSpan.FromMinutes(1));
+            if(type == 1)
+            {
+                _cache.Update("Test", DateTime.Now.ToString(), TimeSpan.FromMinutes(5));
+            }
+            else if (type == 2)
+            {
+                _cache.Add("Test", DateTime.Now.ToString(), TimeSpan.FromMinutes(5),true);
+            }
+            else
+            {
+                _cache.Delete("Test");
+            }
 
-            return "Update Remote Cache Succeed!";
+            return "Update Redis Cache And Notify Succeed!";
         }
     }
 }

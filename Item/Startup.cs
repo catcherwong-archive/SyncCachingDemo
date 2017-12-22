@@ -19,11 +19,12 @@
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddScoped<ICacheSubscriber, RedisCacheSubscriber>();
-            services.AddScoped<ILocalCacheProvider, MemoryCacheProvider>();
-            services.AddScoped<IRemoteCacheProvider, RedisCacheProvider>();
-            services.AddScoped<ISerializer, JsonSerializer>();
-            services.AddScoped<IDemoService, DemoService>();
+
+            services.AddTransient<ICacheSubscriber, RedisCacheSubscriber>();
+            services.AddTransient<ILocalCacheProvider, MemoryCacheProvider>();
+            services.AddTransient<IRemoteCacheProvider, RedisCacheProvider>();
+            services.AddTransient<ISerializer, JsonSerializer>();
+            services.AddTransient<IDemoService, DemoService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -45,7 +46,6 @@
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
 
             var subscriber = app.ApplicationServices.GetRequiredService<ICacheSubscriber>();                   
 
